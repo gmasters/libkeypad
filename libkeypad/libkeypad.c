@@ -29,6 +29,55 @@ int closeKeypad(int fd)
 	return close(fd);
 }
 
+int setPortDirection(int fd, enum KeypadPort portNumber, enum PortDirection direction)
+{
+	char message[10];
+	char port, dir;
+	char buf[100];
+	
+	// assign char for port
+	if (portNumber == PORT_A)
+	{
+		port = '0';
+	}
+	else if (portNumber == PORT_B)
+	{
+		port = '1';
+	}
+	else // (portNumber == PORT_C)
+	{
+		port = '2';
+	}
+	
+	// assign char for direction
+	if (direction == DIR_IN)
+	{
+		dir = 'F';
+	}
+	else // (direction == DIR_OUT)
+	{
+		dir = '0';
+	}
+	
+	// construct message
+	sprintf(message, "@00D%c0%c\r", port, dir);
+	write(fd, message, 8);
+	if (read (fd, buf, sizeof buf) < 0)
+	{
+		fprintf(stderr, "Read failed\n");
+		return -1;
+	}
+	usleep(50);
+	return 0;
+}
+
+
+
+
+
+
+
+
 // rubbish to set it up - move to seperate file
 int set_interface_attribs (int fd, int speed, int parity)
 {

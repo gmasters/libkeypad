@@ -15,6 +15,10 @@ enum KeypadButton{KEY_NONE,
 enum segChar {ZERO=0x3F, ONE=0x06, TWO=0x5B, THREE=0x4F, FOUR=0x66, FIVE=0x6D,
 	      SIX=0x7D, SEVEN=0x07, EIGHT=0x7F, NINE=0x6F, A=0x77, B=0x7C,
 	      C=0x39, D=0x5E, E=0x79, F=0x71};
+	      
+enum KeypadPort {PORT_A, PORT_B, PORT_C};
+
+enum PortDirection {DIR_IN, DIR_OUT};
 
 /* opens the keypad
  * on success returns file descriptor for keypad
@@ -23,6 +27,8 @@ enum segChar {ZERO=0x3F, ONE=0x06, TWO=0x5B, THREE=0x4F, FOUR=0x66, FIVE=0x6D,
 int openKeypad(char* keypadLocation);
 
 int closeKeypad(int fd);
+
+int setPortDirection(int fd, enum KeypadPort portNumber, enum PortDirection direction); 
 
 
 //~ int getRowNumber(char*);
