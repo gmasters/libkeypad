@@ -1,5 +1,7 @@
 #include "libkeypad.h"
 
+#define BUFMAX 100
+
 int set_interface_attribs (int fd, int speed, int parity);
 void set_blocking (int fd, int should_block);
 
@@ -13,8 +15,8 @@ int openKeypad(char* keypadLocation)
 	else
 	{
 		// opened ok, now set it up
-		set_interface_attribs (fd, B115200, 0);  // set speed to 115,200 bps, 8n1 (no parity)
-		set_blocking (fd, 0);                // set no blocking
+	//	set_interface_attribs (fd, B115200, 0);  // set speed to 115,200 bps, 8n1 (no parity)
+	//	set_blocking (fd, 0);                // set no blocking
 	}
 	return fd;
 }
@@ -29,11 +31,50 @@ int closeKeypad(int fd)
 	return close(fd);
 }
 
+int writeKeypad(int fd, char* message, int size)
+{
+	int nbytes;
+	int nbytesTotal = 0;
+	char* unwritten;
+	do
+	{
+		// set unwritten pointer to last written char
+		unwritten = &message[nbytesTotal];
+		
+		// do write
+		nbytes = write(fd, unwritten, size);
+		if (nbytes < 0)
+		{
+			fprintf (stderr, "Error while writing\n");
+			return -1;
+		}
+		nbytesTotal += nbytes;
+	} while (nbytesTotal < size);
+	return nbytesTotal;
+}
+
+int readKeypad(int fd, char* buf, int size)
+{
+	return read(fd, buf, size);
+}
+
+int sendToKeypad(int fd, char* message, char* response)
+{
+	int ret = writeKeypad(fd, message, strlen(message));
+	printf("written %d\n", ret);
+	if (ret < 0)
+	{
+		return ret;
+	}
+	return readKeypad(fd, response, BUFMAX);
+}
+
 int setPortDirection(int fd, enum KeypadPort portNumber, enum PortDirection direction)
 {
 	char message[10];
-	char port, dir;
-	char buf[100];
+	char buf[BUFMAX];
+	char port;
+	int dir;
 	
 	// assign char for port
 	if (portNumber == PORT_A)
@@ -52,30 +93,122 @@ int setPortDirection(int fd, enum KeypadPort portNumber, enum PortDirection dire
 	// assign char for direction
 	if (direction == DIR_IN)
 	{
-		dir = 'F';
+		dir = 0xFF;
 	}
 	else // (direction == DIR_OUT)
 	{
-		dir = '0';
+		dir = 0x00;
 	}
 	
 	// construct message
-	sprintf(message, "@00D%c0%c\r", port, dir);
-	write(fd, message, 8);
-	if (read (fd, buf, sizeof buf) < 0)
-	{
-		fprintf(stderr, "Read failed\n");
-		return -1;
-	}
+	sprintf(message, "@00D%c%02x\r", port, dir);
+	int yes = sendToKeypad(fd, message, buf);
+	printf("buf %d %s\n", yes, buf);
 	usleep(50);
 	return 0;
 }
 
+int selectColumn(int fd, int col)
+{
+	char colChar;
+	char message[10];
+	int ret = 0;
+	char buf[BUFMAX];
+	
+	switch (col)
+	{
+	case 0: 
+		colChar = '1';
+		break;
+	case 1: 
+		colChar = '2';
+		break;
+	case 2: 
+		colChar = '4';
+		break;
+	case 3: 
+		colChar = '8';
+		break;
+	default: 
+		fprintf(stderr, "Invalid Column\n");
+		ret = -1;
+		colChar = 0;
+	}
+	
+	if (colChar)
+	{
+		// construct message
+		sprintf(message, "@00P00%c\r", colChar);	
+		int yes = sendToKeypad(fd, message, buf);
+		printf("buf %d %x\n", yes, buf[0]);
+	}
 
+	usleep(50);
+	return ret;
+}
 
+int write7seg(int fd, enum segChar character)
+{
+	char message[10];
+	char buf[BUFMAX];
+	// construct message
+	sprintf(message, "@00P2%02x\r", character);	
+	int yes = sendToKeypad(fd, message, buf);
+	printf("buf %d %x\n", yes, buf[0]);
+	return 0;
+}
 
+enum KeypadButton buttonPressed(int fd, int col)
+{
+	enum KeypadButton button = KEY_NONE;
+	char buf[BUFMAX];
 
+	int yes = sendToKeypad(fd, "@00P1?\r", buf);
+	printf("buf %d %x\n", yes, buf[0]);
 
+	if (buf[0] != '!')
+	{
+		fprintf(stderr, "Bad Response\n");
+	}
+	else if (strcmp(buf,"!0000\r") != 0)
+	{
+		// something was pressed
+		int row = getRowNumber(&buf[4]);
+		button = getButton(row, col);
+	}
+	return button;
+}
+
+int getRowNumber(char* ch)
+{
+	int row = 0;
+	long int buttonValueRead;
+
+	buttonValueRead = strtol(ch, NULL, 16);
+	printf("hex: %lx, %li\n", buttonValueRead, buttonValueRead);
+	if (buttonValueRead & 0x1)
+	{
+		row = 1;
+	}
+	else if (buttonValueRead & 0x2)
+	{
+		row = 2;
+	}			
+	else if (buttonValueRead & 0x4)
+	{
+		row = 3;
+	}			
+	else /*(buttonValueRead & 0x8)*/
+	{
+		row = 4;
+	}
+	return row;
+}
+
+enum KeypadButton getButton(int row, int col)
+{
+	return ((row - 1) * 4) + (col + 1);
+}
 
 
 // rubbish to set it up - move to seperate file
@@ -135,146 +268,50 @@ void set_blocking (int fd, int should_block)
         if (tcsetattr (fd, TCSANOW, &tty) != 0)
                 fprintf (stderr, "error %d setting term attributes\n", errno);
 }
-//~ 
-//~ int main()
-//~ {
-	//~ char *portname = "/dev/ttyACM0";
-//~ //	char* input = NULL;
-	//~ int i;
-//~ 
-	//~ fd = open (portname, O_RDWR | O_NOCTTY | O_SYNC);
-	//~ if (fd < 0)
-	//~ {
-		//~ fprintf (stderr, "error %d opening %s: %s\n", errno, portname, strerror (errno));
-		//~ return 1;
-	//~ }
-//~ 
-	//~ set_interface_attribs (fd, B115200, 0);  // set speed to 115,200 bps, 8n1 (no parity)
-	//~ set_blocking (fd, 0);                // set no blocking
-//~ 
-	//~ printf("set up\n");
-//~ 
-	//~ write (fd, "@00D1FF\r", 8);
-	//~ char buf [100];
-	//~ int n = read (fd, buf, sizeof buf);
-	//~ if (!n)
-		//~ fprintf(stderr, "Read failed\n");
-//~ 
-	//~ write (fd, "@00D000\r", 8);
-	//~ n = read (fd, buf, sizeof buf);
-	//~ if (!n)
-		//~ fprintf(stderr, "Read failed\n");
-//~ 
-//~ //	char pints[10];
-	//~ enum KeypadButton pincode[3];
-	//~ int count=0;
-	//~ int pressed = 0;
-	//~ int lastCol = -1;
-//~ 
-	//~ for (i = 0; i < 4; i++)
-		//~ pincode[i] = -1;
-//~ 
-	//~ int col;
-	//~ for (col = 0; col < 5; col++, col = col % 4)
-	//~ {
-		//~ // printf("col is %d ", col);
-		//~ selectCol(col);
-		//~ writeNum(pincode[col]);
-//~ 
-		//~ if (count > 3)
-			//~ continue;
-//~ 
-		//~ enum KeypadButton button = buttonPressed(col);
-		//~ //button--;
-//~ 
-		//~ if (button == KEY_NONE)
-		//~ {
-			//~ if (lastCol == col)
-			//~ {
-				//~ pressed = 0;
-			//~ }
-			//~ printf("nothing\n");
-		//~ }
-		//~ else
-		//~ {
-			//~ if (pressed)
-			//~ {
-				//~ // ignore button held down
-//~ printf("held\n");
-				//~ continue;
-			//~ }
-			//~ // a new button was pressed
-			//~ if (!buttonIsNumeric(button))
-				//~ continue;
-//~ 
-			//~ pincode[count] = getRealNumber(button);
-			//~ pressed = 1;
-			//~ lastCol = col;
-			//~ count++;
-			//~ printf("count is %d ", count);
-		//~ }
-	//~ /*		
-//~ 
-		//~ write (fd, "@00P1?\r", 7);
-		//~ n = read (fd, buf, sizeof buf);
-		//~ if (!n)
-			//~ fprintf(stderr, "Read failed\n");
-		//~ usleep(1000);
-//~ 
-		//~ if (strcmp(buf,"!0000\r") != 0)
-		//~ {
-			//~ if (pressed)
-			//~ {
-				//~ // ignore button held down
-				//~ continue;
-			//~ }
-			//~ // something was pressed
-			//~ int row = 0;
-			//~ int col = 0;
-			//~ enum KeypadButton button = KEY_1;
-			//~ 
-			//~ row = getRowNumber(&buf[4]);
-//~ 
-			//~ int j;
-			//~ for (j=1; j<5; j++)
-			//~ {
-				//~ if (checkColumnForPressed(j))
-				//~ {
-					//~ col = j;
-					//~ break;
-				//~ }
-			//~ }
-			//~ 
-			//~ printf("col: %d\n", col);
-			//~ button = getButton(row,col);
-			//~ printf("button: %d\n", button);
-//~ 
-			//~ if (!buttonIsNumeric(button))
-				//~ continue;
-//~ 
-			//~ showButton(button);
-//~ 
-			//~ pincode[count] = getRealNumber(button);
-			//~ pressed = 1;
-			//~ count++;
-			//~ if (count > 3)
-				//~ break;*/
-//~ /*		}
-		//~ else
-		//~ {
-			//~ printf("nothing\n");
-			//~ pressed = 0;
-		//~ }	*/	
-		//~ usleep(1000);
-	//~ }
-//~ /*	int disp;
-	//~ for (disp = 0; disp < count; disp++)
-	//~ {
-		//~ printf("%d", pincode[disp]);
-	//~ }
-	//~ printf("\n");*/
-	//~ return 0;
-//~ }
+
+enum segChar getHexRepresentation(int character)
+{
+	enum segChar seg;
+	switch (character)
+	{
+	case 1:
+		seg = ONE; break;
+	case 2:
+		seg = TWO; break;
+	case 3:
+		seg = THREE; break;
+	case 4:
+		seg = FOUR; break;
+	case 5:
+		seg = FIVE; break;
+	case 6:
+		seg = SIX; break;
+	case 7:
+		seg = SEVEN; break;
+	case 8:
+		seg = EIGHT; break;
+	case 9:
+		seg = NINE; break;
+	case 0:
+		seg = ZERO; break;
+	case 'A':
+		seg = A; break;
+	case 'B':
+		seg = B; break;
+	case 'C':
+		seg = C; break;
+	case 'D':
+		seg = D; break;
+	case 'E':
+		seg = E; break;
+	case 'F':
+		seg = F; break;
+	default: // BLANK
+		seg = BLANK;
+	}
+	return seg;
+}
+
 //~ 
 //~ void selectCol(int col)
 //~ {

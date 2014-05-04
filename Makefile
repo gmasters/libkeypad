@@ -11,7 +11,7 @@ OBJS		= example.o
 
 all: example
 
-example: $(OBJS)
+example: $(OBJS) $(LIBS)
 	$(CC) $(CFLAGS) $^ -o $@ $(LIBS)
 	
 %.c.o: %.c
