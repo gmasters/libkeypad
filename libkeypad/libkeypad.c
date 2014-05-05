@@ -269,85 +269,99 @@ void set_blocking (int fd, int should_block)
                 fprintf (stderr, "error %d setting term attributes\n", errno);
 }
 
-enum segChar getHexRepresentation(int character)
+enum segChar getHexRepresentation(enum KeypadButton button)
 {
 	enum segChar seg;
-	switch (character)
+	switch (button)
 	{
-	case 1:
+	case KEY_1:
 		seg = ONE; break;
-	case 2:
+	case KEY_2:
 		seg = TWO; break;
-	case 3:
+	case KEY_3:
 		seg = THREE; break;
-	case 4:
+	case KEY_4:
 		seg = FOUR; break;
-	case 5:
+	case KEY_5:
 		seg = FIVE; break;
-	case 6:
+	case KEY_6:
 		seg = SIX; break;
-	case 7:
+	case KEY_7:
 		seg = SEVEN; break;
-	case 8:
+	case KEY_8:
 		seg = EIGHT; break;
-	case 9:
+	case KEY_9:
 		seg = NINE; break;
-	case 0:
+	case KEY_0:
 		seg = ZERO; break;
-	case 'A':
+	case KEY_A:
 		seg = A; break;
-	case 'B':
+	case KEY_B:
 		seg = B; break;
-	case 'C':
+	case KEY_C:
 		seg = C; break;
-	case 'D':
+	case KEY_D:
 		seg = D; break;
-	case 'E':
+	case KEY_E:
 		seg = E; break;
-	case 'F':
+	case KEY_F:
 		seg = F; break;
-	default: // BLANK
+	default: // KEY_NONE
 		seg = BLANK;
 	}
 	return seg;
 }
 
-//~ 
-//~ void selectCol(int col)
-//~ {
-	//~ char buf [100];
-	//~ int n;
-	//~ if (col == 0)
-	//~ {
-		//~ write (fd, "@00P001\r", 8);
-		//~ n = read (fd, buf, sizeof buf);
-		//~ if (!n)
-			//~ fprintf(stderr, "Read failed\n");
-	//~ }
-	//~ else if (col == 1)
-	//~ {
-		//~ write (fd, "@00P002\r", 8);
-		//~ n = read (fd, buf, sizeof buf);
-		//~ if (!n)
-			//~ fprintf(stderr, "Read failed\n");
-	//~ }
-	//~ else if (col == 2)
-	//~ {
-		//~ write (fd, "@00P004\r", 8);
-		//~ n = read (fd, buf, sizeof buf);
-		//~ if (!n)
-			//~ fprintf(stderr, "Read failed\n");
-	//~ }
-	//~ else if (col == 3)
-	//~ {
-		//~ write (fd, "@00P008\r", 8);
-		//~ n = read (fd, buf, sizeof buf);
-		//~ if (!n)
-			//~ fprintf(stderr, "Read failed\n");
-	//~ }
-//~ 
-	//~ usleep(1000);
-//~ }
+int buttonIsNumeric(enum KeypadButton button)
+{
+	int isNumeric;
+	switch (button)
+	{
+	case KEY_NONE:
+		isNumeric = -1; break;
+	case KEY_A:
+	case KEY_B:
+	case KEY_C:
+	case KEY_D:
+	case KEY_E:
+	case KEY_F:
+		isNumeric = 0; break;
+	default /*Numeric*/:
+		isNumeric = 1; break;
+	}
+	return isNumeric;
+}
+
+int getRealNumber(enum KeypadButton button)
+{
+	int number;
+	switch (button)
+	{
+	case KEY_1:
+		number = 1; break;
+	case KEY_2:
+		number = 2; break;
+	case KEY_3:
+		number = 3; break;
+	case KEY_4:
+		number = 4; break;
+	case KEY_5:
+		number = 5; break;
+	case KEY_6:
+		number = 6; break;
+	case KEY_7:
+		number = 7; break;
+	case KEY_8:
+		number = 8; break;
+	case KEY_9:
+		number = 9; break;
+	case KEY_0:
+		number = 0; break;
+	default /*Letter or blank*/:
+		number = -1; break;
+	}
+	return number;
+}
 //~ 
 //~ void writeNum(int number)
 //~ {
@@ -489,61 +503,6 @@ enum segChar getHexRepresentation(int character)
 	//~ return 0;
 //~ }
 //~ 
-//~ enum KeypadButton getButton(int row, int col)
-//~ {
-	//~ return ((row - 1) * 4) + (col + 1);
-//~ }
-//~ 
-//~ // return 1 = it is
-//~ int buttonIsNumeric(enum KeypadButton button)
-//~ {
-	//~ int isNumeric;
-	//~ switch (button)
-	//~ {
-	//~ case KEY_A:
-	//~ case KEY_B:
-	//~ case KEY_C:
-	//~ case KEY_D:
-	//~ case KEY_E:
-	//~ case KEY_F:
-		//~ isNumeric = 0; break;
-	//~ default /*Numeric*/:
-		//~ isNumeric = 1; break;
-	//~ }
-	//~ return isNumeric;
-//~ }
-//~ 
-//~ int getRealNumber(enum KeypadButton button)
-//~ {
-	//~ int number;
-	//~ switch (button)
-	//~ {
-	//~ case KEY_1:
-		//~ number = 1; break;
-	//~ case KEY_2:
-		//~ number = 2; break;
-	//~ case KEY_3:
-		//~ number = 3; break;
-	//~ case KEY_4:
-		//~ number = 4; break;
-	//~ case KEY_5:
-		//~ number = 5; break;
-	//~ case KEY_6:
-		//~ number = 6; break;
-	//~ case KEY_7:
-		//~ number = 7; break;
-	//~ case KEY_8:
-		//~ number = 8; break;
-	//~ case KEY_9:
-		//~ number = 9; break;
-	//~ case KEY_0:
-		//~ number = 0; break;
-	//~ default /*Letter*/:
-		//~ number = -1; break;
-	//~ }
-	//~ return number;
-//~ }
-//~ 
 //~ void showButton(enum KeypadButton button)
 //~ {
 	//~ char buf [100];
@@ -556,47 +515,5 @@ enum segChar getHexRepresentation(int character)
 	//~ write (fd, pints, 8);
 	//~ read (fd, buf, sizeof buf);
 	//~ usleep(1000);
-//~ }
-//~ 
-//~ enum segChar getHexRepresentation(int button)
-//~ {
-	//~ enum segChar seg;
-	//~ //button++;
-	//~ switch (button)
-	//~ {
-	//~ case 1:
-		//~ seg = ONE; break;
-	//~ case 2:
-		//~ seg = TWO; break;
-	//~ case 3:
-		//~ seg = THREE; break;
-//~ /*	case KEY_F:
-		//~ seg = F; break;*/
-	//~ case 4:
-		//~ seg = FOUR; break;
-	//~ case 5:
-		//~ seg = FIVE; break;
-	//~ case 6:
-		//~ seg = SIX; break;
-//~ /*	case KEY_E:
-		//~ seg = E; break;*/
-	//~ case 7:
-		//~ seg = SEVEN; break;
-	//~ case 8:
-		//~ seg = EIGHT; break;
-	//~ case 9:
-		//~ seg = NINE; break;
-//~ /*	case KEY_D:
-		//~ seg = D; break;
-	//~ case KEY_A:
-		//~ seg = A; break;*/
-	//~ case 0:
-		//~ seg = ZERO; break;
-//~ /*	case KEY_B:
-		//~ seg = B; break;
-	//~ default:
-		//~ seg = C; break;*/
-	//~ }
-	//~ return seg;
 //~ }
 //~ 

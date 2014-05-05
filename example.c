@@ -26,17 +26,21 @@ int main()
 	
 	getchar();
 	
-	int ok = 1;
+	enum KeypadButton pincode[4] = { KEY_NONE, KEY_NONE, KEY_NONE, KEY_NONE };
+	int done = 0;
+	int count = 0;
 	int col;
 	int pressed = 0;
 	int lastCol = -1;
 	enum segChar writeChar;
+	
 	// loop over column, always between 0 and 3
-	for (col = 0; col < 5 && ok; col++, col %= 4)
+	for (col = 0; col < 5 && !done; col++, col %= 4)
 	{
 		selectColumn(fd, col);
 		
-		writeChar = getHexRepresentation(col);
+		//writeChar = getHexRepresentation(col);
+		writeChar = getHexRepresentation(pincode[col]);
 		write7seg(fd, writeChar);
 		
 		enum KeypadButton button = buttonPressed(fd, col);
@@ -56,21 +60,26 @@ int main()
 			{
 				// ignore button held down
 				printf("held\n");
-				continue;
 			}
-			// a new button was pressed
-			//~ if (!buttonIsNumeric(button))
-				//~ continue;
-//~ 
-			//~ pincode[count] = getRealNumber(button);
-			//~ pressed = 1;
-			//~ lastCol = col;
-			//~ count++;
-			//~ printf("count is %d ", count);
-			
+			else if (buttonIsNumeric(button))
+			{
+				// a new button was pressed
+				pincode[count] = button;
+				pressed = 1;
+				lastCol = col;
+				count++;
+				printf("count is %d ", count);
+			}
 			usleep(1000);
 		}
+		
+		if (count == 4)
+		{
+			done = 1;
+		}
 	}
+	printf("pincode entered, exiting\n");
+	getchar();
 	closeKeypad(fd);
 	return 0;
 }

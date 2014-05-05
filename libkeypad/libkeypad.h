@@ -36,7 +36,7 @@ int setPortDirection(int fd, enum KeypadPort portNumber, enum PortDirection dire
 
 int selectColumn(int fd, int col);
 
-enum segChar getHexRepresentation(int character);
+enum segChar getHexRepresentation(enum KeypadButton button);
 
 int write7seg(int fd, enum segChar character);
 
@@ -45,6 +45,10 @@ enum KeypadButton buttonPressed(int fd, int col);
 int getRowNumber(char* ch);
 
 enum KeypadButton getButton(int row, int col);
+
+int buttonIsNumeric(enum KeypadButton button);
+
+int getRealNumber(enum KeypadButton button);
 
 
 //~ int getRowNumber(char*);
