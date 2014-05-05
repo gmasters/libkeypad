@@ -104,17 +104,14 @@ int setPortDirection(int fd, enum KeypadPort portNumber, enum PortDirection dire
 */
 int selectColumn(int fd, int col);
 
-<<<<<<< HEAD
-enum segChar getHexRepresentation(enum KeypadButton button);
-=======
+
 /**
  Get the hexadecimel value required to show a character
  
  @param character: The character for which hexadecimal representation is required
  @return : The enum value that contains the desired hexadecimal value
 */
-enum segChar getHexRepresentation(int character);
->>>>>>> 3a3806b8a475bf284479dcb88e65740918d54a66
+enum segChar getHexRepresentation(enum KeypadButton button);
 
 /**
  Write a value to the 7 segment display on the keypad

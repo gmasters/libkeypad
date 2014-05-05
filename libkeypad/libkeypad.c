@@ -274,77 +274,40 @@ enum segChar getHexRepresentation(enum KeypadButton button)
 	enum segChar seg;
 	switch (button)
 	{
-<<<<<<< HEAD
 	case KEY_1:
-		seg = ONE; break;
-	case KEY_2:
-		seg = TWO; break;
-	case KEY_3:
-		seg = THREE; break;
-	case KEY_4:
-		seg = FOUR; break;
-	case KEY_5:
-		seg = FIVE; break;
-	case KEY_6:
-		seg = SIX; break;
-	case KEY_7:
-		seg = SEVEN; break;
-	case KEY_8:
-		seg = EIGHT; break;
-	case KEY_9:
-		seg = NINE; break;
-	case KEY_0:
-		seg = ZERO; break;
-	case KEY_A:
-		seg = A; break;
-	case KEY_B:
-		seg = B; break;
-	case KEY_C:
-		seg = C; break;
-	case KEY_D:
-		seg = D; break;
-	case KEY_E:
-		seg = E; break;
-	case KEY_F:
-		seg = F; break;
-	default: // KEY_NONE
-		seg = BLANK;
-=======
-	case 1:
 		seg = SEG_ONE; break;
-	case 2:
+	case KEY_2:
 		seg = SEG_TWO; break;
-	case 3:
+	case KEY_3:
 		seg = SEG_THREE; break;
-	case 4:
+	case KEY_4:
 		seg = SEG_FOUR; break;
-	case 5:
+	case KEY_5:
 		seg = SEG_FIVE; break;
-	case 6:
+	case KEY_6:
 		seg = SEG_SIX; break;
-	case 7:
+	case KEY_7:
 		seg = SEG_SEVEN; break;
-	case 8:
+	case KEY_8:
 		seg = SEG_EIGHT; break;
-	case 9:
+	case KEY_9:
 		seg = SEG_NINE; break;
-	case 0:
+	case KEY_0:
 		seg = SEG_ZERO; break;
-	case 'A':
+	case KEY_A:
 		seg = SEG_A; break;
-	case 'B':
+	case KEY_B:
 		seg = SEG_B; break;
-	case 'C':
+	case KEY_C:
 		seg = SEG_C; break;
-	case 'D':
+	case KEY_D:
 		seg = SEG_D; break;
-	case 'E':
+	case KEY_E:
 		seg = SEG_E; break;
-	case 'F':
+	case KEY_F:
 		seg = SEG_F; break;
-	default: // BLANK
+	default: // KEY_NONE
 		seg = SEG_BLANK;
->>>>>>> 3a3806b8a475bf284479dcb88e65740918d54a66
 	}
 	return seg;
 }
