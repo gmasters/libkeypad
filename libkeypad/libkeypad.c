@@ -275,39 +275,39 @@ enum segChar getHexRepresentation(int character)
 	switch (character)
 	{
 	case 1:
-		seg = ONE; break;
+		seg = SEG_ONE; break;
 	case 2:
-		seg = TWO; break;
+		seg = SEG_TWO; break;
 	case 3:
-		seg = THREE; break;
+		seg = SEG_THREE; break;
 	case 4:
-		seg = FOUR; break;
+		seg = SEG_FOUR; break;
 	case 5:
-		seg = FIVE; break;
+		seg = SEG_FIVE; break;
 	case 6:
-		seg = SIX; break;
+		seg = SEG_SIX; break;
 	case 7:
-		seg = SEVEN; break;
+		seg = SEG_SEVEN; break;
 	case 8:
-		seg = EIGHT; break;
+		seg = SEG_EIGHT; break;
 	case 9:
-		seg = NINE; break;
+		seg = SEG_NINE; break;
 	case 0:
-		seg = ZERO; break;
+		seg = SEG_ZERO; break;
 	case 'A':
-		seg = A; break;
+		seg = SEG_A; break;
 	case 'B':
-		seg = B; break;
+		seg = SEG_B; break;
 	case 'C':
-		seg = C; break;
+		seg = SEG_C; break;
 	case 'D':
-		seg = D; break;
+		seg = SEG_D; break;
 	case 'E':
-		seg = E; break;
+		seg = SEG_E; break;
 	case 'F':
-		seg = F; break;
+		seg = SEG_F; break;
 	default: // BLANK
-		seg = BLANK;
+		seg = SEG_BLANK;
 	}
 	return seg;
 }
