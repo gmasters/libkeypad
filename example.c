@@ -1,5 +1,4 @@
 #include <stdio.h>
-
 #include <libkeypad.h>
 
 int main()
@@ -8,8 +7,16 @@ int main()
 	enum KeypadPort portA = PORT_A;
 	enum KeypadPort portB = PORT_B;
 	enum KeypadPort portC = PORT_C;
-//	char *keypadname = "/dev/ttyACM0";
-	char *keypadname = "dummyfile";
+	char *keypadname = "/dev/ttyACM0";
+	//char *keypadname = "dummyfile";
+	
+	enum KeypadButton pincode[4] = { KEY_NONE, KEY_NONE, KEY_NONE, KEY_NONE };
+	int done = 0;
+	int count = 0;
+	int col;
+	int pressed = 0;
+	int lastCol = -1;
+	enum segChar writeChar;
 	
 	printf("About to open keypad!\n");
 	
@@ -24,16 +31,6 @@ int main()
 	setPortDirection(fd, portB, DIR_IN);
 	setPortDirection(fd, portC, DIR_OUT);
 	
-	getchar();
-	
-	enum KeypadButton pincode[4] = { KEY_NONE, KEY_NONE, KEY_NONE, KEY_NONE };
-	int done = 0;
-	int count = 0;
-	int col;
-	int pressed = 0;
-	int lastCol = -1;
-	enum segChar writeChar;
-	
 	// loop over column, always between 0 and 3
 	for (col = 0; col < 5 && !done; col++, col %= 4)
 	{
@@ -44,7 +41,6 @@ int main()
 		write7seg(fd, writeChar);
 		
 		enum KeypadButton button = buttonPressed(fd, col);
-		//button--;
 
 		if (button == KEY_NONE)
 		{
@@ -52,6 +48,7 @@ int main()
 			{
 				pressed = 0;
 			}
+			
 			printf("nothing\n");
 		}
 		else
@@ -69,19 +66,20 @@ int main()
 				lastCol = col;
 				count++;
 				printf("count is %d ", count);
-			}
-			usleep(1000);
+			}			
 		}
 		
 		if (count == 4)
 		{
 			done = 1;
 		}
+		
+		usleep(1000);
 	}
+	
 	printf("pincode entered, exiting\n");
 	getchar();
 	closeKeypad(fd);
+	
 	return 0;
 }
-
-

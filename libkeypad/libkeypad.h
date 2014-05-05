@@ -14,7 +14,7 @@
 @description :
 	Header file for libkeypad.c
 	This file contains the includes, defined types and function declarations
-************************************************************************************/
+**/
 
 // Includes
 #include <errno.h>
@@ -25,6 +25,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 
+// The buttons on the keypad
 enum KeypadButton 
 {
 	KEY_NONE, 
@@ -34,15 +35,18 @@ enum KeypadButton
 	KEY_A, KEY_0, KEY_B, KEY_C
 };
 
+// Hexadecimal value to display the character correctly
 enum segChar 
 {	
 	SEG_BLANK=0x00, SEG_ZERO=0x3F, SEG_ONE=0x06, SEG_TWO=0x5B, SEG_THREE=0x4F, 
 	SEG_FOUR=0x66, SEG_FIVE=0x6D, SEG_SIX=0x7D, SEG_SEVEN=0x07, SEG_EIGHT=0x7F, 
 	SEG_NINE=0x6F, SEG_A=0x77, SEG_B=0x7C, SEG_C=0x39, SEG_D=0x5E, SEG_E=0x79, SEG_F=0x71
 };
-	      
+
+// The ports on the keypad
 enum KeypadPort { PORT_A, PORT_B, PORT_C };
 
+// The directions for the port/s on the keypad
 enum PortDirection { DIR_IN, DIR_OUT };
 
 /**
@@ -104,7 +108,6 @@ int setPortDirection(int fd, enum KeypadPort portNumber, enum PortDirection dire
 */
 int selectColumn(int fd, int col);
 
-
 /**
  Get the hexadecimel value required to show a character
  
@@ -148,19 +151,18 @@ int getRowNumber(char* ch);
 */
 enum KeypadButton getButton(int row, int col);
 
+/**
+ Check if the button is 0-9
+ 
+ @param button: The button to check
+ @return : True/False, whether the button is a number or not
+*/
 int buttonIsNumeric(enum KeypadButton button);
 
+/**
+ Gives an integer representation of a numeric button
+ 
+ @param button: The numeric button
+ @return : The integer representation of the numeric button
+*/
 int getRealNumber(enum KeypadButton button);
-
-
-//~ int getRowNumber(char*);
-//~ int checkColumnForPressed(int);
-//~ enum KeypadButton getButton(int, int);
-//~ void showButton(enum KeypadButton);
-//~ enum segChar getHexRepresentation(int button);
-//~ int buttonIsNumeric(enum KeypadButton);
-//~ int getRealNumber(enum KeypadButton button);
-//~ 
-//~ void selectCol(int col);
-//~ void writeNum(int number);
-//~ enum KeypadButton buttonPressed(int col);

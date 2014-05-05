@@ -1,3 +1,21 @@
+/**
+@file :	
+	libkeypad.c
+
+@version : 
+	1.0
+
+@authors : 
+	Gregory Masters
+	Thomas West
+	Steven Square
+	Nathan Toft
+
+@description :
+	Source file for keypad library
+	This file contains the implementation of functionality for the keypad library
+**/
+
 #include "libkeypad.h"
 
 #define BUFMAX 100
@@ -15,8 +33,8 @@ int openKeypad(char* keypadLocation)
 	else
 	{
 		// opened ok, now set it up
-	//	set_interface_attribs (fd, B115200, 0);  // set speed to 115,200 bps, 8n1 (no parity)
-	//	set_blocking (fd, 0);                // set no blocking
+		set_interface_attribs (fd, B115200, 0); // set speed to 115,200 bps, 8n1 (no parity)
+		set_blocking (fd, 0); // set no blocking
 	}
 	return fd;
 }
@@ -210,7 +228,6 @@ enum KeypadButton getButton(int row, int col)
 	return ((row - 1) * 4) + (col + 1);
 }
 
-
 // rubbish to set it up - move to seperate file
 int set_interface_attribs (int fd, int speed, int parity)
 {
@@ -362,158 +379,3 @@ int getRealNumber(enum KeypadButton button)
 	}
 	return number;
 }
-//~ 
-//~ void writeNum(int number)
-//~ {
-	//~ enum segChar writeChar;
-	//~ char buf [100];
-	//~ char pints[10];
-	//~ int n;
-	//~ printf("num %d\n", number);
-	//~ if (number < 0)
-	//~ {
-		//~ writeChar = 0x00;
-	//~ }
-	//~ else
-	//~ {
- 		//~ writeChar = getHexRepresentation(number); 
-	//~ }
-//~ 
-	//~ sprintf (pints, "@00P2%02x\r", writeChar);
-//~ //	printf("Displaying: %02x\n", writeChar);
-//~ //	printf("PINTS %s\n", pints);
-	//~ write (fd, pints, 8);
-	//~ n = read (fd, buf, sizeof buf);
-	//~ if (!n)
-		//~ fprintf(stderr, "Read failed\n");
-	//~ usleep(1000);
-//~ 
-	//~ // write blank so it doesnt interfere with the next
-	//~ write (fd, "@00P200\r", 8);
-	//~ n = read (fd, buf, sizeof buf);
-	//~ if (!n)
-		//~ fprintf(stderr, "Read failed\n");
-	//~ usleep(50);
-//~ }
-//~ 
-//~ enum KeypadButton buttonPressed(int col)
-//~ {
-	//~ char buf [100];
-	//~ int n;
-//~ 
-	//~ write (fd, "@00P1?\r", 7);
-	//~ n = read (fd, buf, sizeof buf);
-	//~ if (!n)
-		//~ fprintf(stderr, "Read failed\n");
-	//~ usleep(100);
-//~ 
-	//~ if (strcmp(buf,"!0000\r") != 0)
-	//~ {
-		//~ //getchar();
-		//~ // something was pressed
-		//~ int row = 0;
-		//~ enum KeypadButton button = KEY_1;
-		//~ 
-		//~ row = getRowNumber(&buf[4]);
-		//~ return getButton(row,col);
-	//~ }
-	//~ return KEY_NONE;
-//~ }
-//~ 
-//~ 
-//~ int getRowNumber(char* ch)
-//~ {
-	//~ int row = 0;
-	//~ long int buttonValueRead;
-	//~ //last digit will be 1,2,4 or 8
-	//~ /*switch (buf[4])
-	//~ {
-	//~ case '1': // number could be 1 2 3 F
-		//~ row = 1; break;
-	//~ case '2': // number could be 4 5 6 E
-		//~ row = 2; break;
-	//~ case '4': // number could be 7 8 9 D
-		//~ row = 3; break;
-	//~ default: // number could be A 0 B C	
-		//~ row = 4; break;
-	//~ }*/
-	//~ // printf("buf4 %c\trow: %d\n", ch], row);
-//~ 
-	//~ buttonValueRead = strtol(ch, NULL, 16);
-	//~ printf("hex: %x, %li\n", buttonValueRead, buttonValueRead);
-	//~ if (buttonValueRead & 0x1)
-	//~ {
-		//~ row = 1;
-	//~ }
-	//~ else if (buttonValueRead & 0x2)
-	//~ {
-		//~ row = 2;
-	//~ }			
-	//~ else if (buttonValueRead & 0x4)
-	//~ {
-		//~ row = 3;
-	//~ }			
-	//~ else /*(buttonValueRead & 0x8)*/
-	//~ {
-		//~ row = 4;
-	//~ }
-	//~ return row;
-//~ }
-//~ 
-//~ // return 1 if a button pressed else 0
-//~ int checkColumnForPressed(int column)
-//~ {
-	//~ char pints[10];
-	//~ int colHex;
-	//~ int n=0;
-	//~ char buf [100];
-//~ 
-	//~ switch (column)
-	//~ {
-	//~ case 1:
-		//~ colHex = 1; break;
-	//~ case 2:
-		//~ colHex = 2; break;
-	//~ case 3:
-		//~ colHex = 4; break;
-	//~ default:
-		//~ colHex = 8; break;
-	//~ }
-	//~ printf("column: %d\n", column);
-//~ 
-	//~ // set port0 to only read 1 column
-	//~ sprintf (pints, "@00P00%1x\r", colHex);
-	//~ write (fd, pints, 8);
-	//~ n = read (fd, buf, sizeof buf);
-	//~ if (!n)
-		//~ fprintf(stderr, "Read failed\n");
-	//~ usleep(10);
-//~ 
-	//~ // now do the actual read on port1
-	//~ write (fd, "@00P1?\r", 7);
-	//~ n = read (fd, buf, sizeof buf);
-	//~ if (!n)
-		//~ fprintf(stderr, "Read failed\n");
-	//~ usleep(100);
-//~ 
-	//~ if (strcmp(buf,"!0000\r") != 0)
-	//~ {
-		//~ return 1;
-	//~ }
-	//~ return 0;
-//~ }
-//~ 
-//~ void showButton(enum KeypadButton button)
-//~ {
-	//~ char buf [100];
-	//~ char pints[10];
-//~ //	char buttonChar = buttonStrings[button][0];
-	//~ enum segChar hexToPrint = getHexRepresentation(button);
-	//~ sprintf (pints, "@00P2%02x\r", hexToPrint);
-	//~ printf("Displaying: %02x\n", hexToPrint);
-	//~ printf("PINTS %s\n", pints);
-	//~ write (fd, pints, 8);
-	//~ read (fd, buf, sizeof buf);
-	//~ usleep(1000);
-//~ }
-//~ 
