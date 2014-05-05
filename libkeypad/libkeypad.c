@@ -274,6 +274,7 @@ enum segChar getHexRepresentation(enum KeypadButton button)
 	enum segChar seg;
 	switch (button)
 	{
+<<<<<<< HEAD
 	case KEY_1:
 		seg = ONE; break;
 	case KEY_2:
@@ -308,6 +309,42 @@ enum segChar getHexRepresentation(enum KeypadButton button)
 		seg = F; break;
 	default: // KEY_NONE
 		seg = BLANK;
+=======
+	case 1:
+		seg = SEG_ONE; break;
+	case 2:
+		seg = SEG_TWO; break;
+	case 3:
+		seg = SEG_THREE; break;
+	case 4:
+		seg = SEG_FOUR; break;
+	case 5:
+		seg = SEG_FIVE; break;
+	case 6:
+		seg = SEG_SIX; break;
+	case 7:
+		seg = SEG_SEVEN; break;
+	case 8:
+		seg = SEG_EIGHT; break;
+	case 9:
+		seg = SEG_NINE; break;
+	case 0:
+		seg = SEG_ZERO; break;
+	case 'A':
+		seg = SEG_A; break;
+	case 'B':
+		seg = SEG_B; break;
+	case 'C':
+		seg = SEG_C; break;
+	case 'D':
+		seg = SEG_D; break;
+	case 'E':
+		seg = SEG_E; break;
+	case 'F':
+		seg = SEG_F; break;
+	default: // BLANK
+		seg = SEG_BLANK;
+>>>>>>> 3a3806b8a475bf284479dcb88e65740918d54a66
 	}
 	return seg;
 }
