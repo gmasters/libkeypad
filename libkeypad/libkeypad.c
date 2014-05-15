@@ -122,6 +122,8 @@ int setPortDirection(int fd, enum KeypadPort portNumber, enum PortDirection dire
 	sprintf(message, "@00D%c%02x\r", port, dir);
 	int yes = sendToKeypad(fd, message, buf);
 	printf("buf %d %s\n", yes, buf);
+//	printf("message %s\n", message);
+//	getchar();
 	usleep(50);
 	return 0;
 }
@@ -159,6 +161,8 @@ int selectColumn(int fd, int col)
 		sprintf(message, "@00P00%c\r", colChar);	
 		int yes = sendToKeypad(fd, message, buf);
 		printf("buf %d %x\n", yes, buf[0]);
+		//~ printf("message %s\n", message);
+		//~ getchar();
 	}
 
 	usleep(50);
@@ -182,18 +186,20 @@ enum KeypadButton buttonPressed(int fd, int col)
 	char buf[BUFMAX];
 
 	int yes = sendToKeypad(fd, "@00P1?\r", buf);
-	printf("buf %d %x\n", yes, buf[0]);
+//	printf("buf %d %s\n", yes, buf);
 
 	if (buf[0] != '!')
 	{
 		fprintf(stderr, "Bad Response\n");
 	}
-	else if (strcmp(buf,"!0000\r") != 0)
+	else if (strncmp(buf,"!0000", 5) != 0)
 	{
 		// something was pressed
 		int row = getRowNumber(&buf[4]);
 		button = getButton(row, col);
 	}
+	//~ printf("message %c%c%c%c%c\n", buf[0],buf[1],buf[2],buf[3],buf[4]);
+	//~ getchar();
 	return button;
 }
 

@@ -32,7 +32,7 @@ int main()
 	setPortDirection(fd, portC, DIR_OUT);
 	
 	// loop over column, always between 0 and 3
-	for (col = 0; col < 5 && !done; col++, col %= 4)
+	for (col = 0; col < 4 && !done; col++, col %= 4)
 	{
 		selectColumn(fd, col);
 		
@@ -74,10 +74,12 @@ int main()
 			done = 1;
 		}
 		
-		usleep(1000);
+		usleep(5000);
 	}
 	
-	printf("pincode entered, exiting\n");
+	printf("pincode entered, %d %d %d %d\n", 
+			getRealNumber(pincode[0]), getRealNumber(pincode[1]), 
+			getRealNumber(pincode[2]), getRealNumber(pincode[3]));
 	getchar();
 	closeKeypad(fd);
 	
